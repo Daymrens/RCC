@@ -23,9 +23,9 @@ model Device {
 }
 
 model Function {
-  id          String   @id @default(uuid())
+  id          String            @id @default(uuid())
   deviceId    String
-  device      Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  device      Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   name        String
   description String?
   type        String
@@ -33,19 +33,48 @@ model Function {
   flowData    String?
   trigger     String
   intervalMs  Int?
+  version     Int               @default(1)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  versions    FunctionVersion[]
+}
+
+model FunctionVersion {
+  id          String   @id @default(uuid())
+  functionId  String
+  function    Function @relation(fields: [functionId], references: [id], onDelete: Cascade)
+  version     Int
+  code        String?
+  flowData    String?
+  trigger     String
+  intervalMs  Int?
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  comment     String?
 }
 
 model Flow {
-  id        String   @id @default(uuid())
+  id        String            @id @default(uuid())
   deviceId  String
-  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  device    Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   name      String
   nodes     String
   edges     String
-  isActive  Boolean  @default(false)
-  createdAt DateTime @default(now())
+  isActive  Boolean           @default(false)
+  createdAt DateTime          @default(now())
+  executions FlowExecution[]
+}
+
+model FlowExecution {
+  id          String   @id @default(uuid())
+  flowId      String
+  flow        Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  status      String   @default("running")
+  logs        String
+  error       String?
+  duration    Int?
 }
 
 model Dashboard {

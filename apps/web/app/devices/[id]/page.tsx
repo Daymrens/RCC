@@ -57,6 +57,12 @@ export default function DevicePage() {
           Flows
         </Link>
         <Link
+          href={`/devices/${device.id}/telemetry`}
+          className="px-4 py-2 hover:text-accent border-b-2 border-transparent hover:border-accent"
+        >
+          Telemetry
+        </Link>
+        <Link
           href={`/devices/${device.id}/logs`}
           className="px-4 py-2 hover:text-accent border-b-2 border-transparent hover:border-accent"
         >

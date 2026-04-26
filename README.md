@@ -93,6 +93,13 @@ RoboDesk is a **localhost-first fullstack platform** that brings professional-gr
 
 ### 🔥 Advanced Features
 
+- **Telemetry Charts** - Real-time data visualization with Recharts (line, bar, area charts)
+- **Function Versioning** - Track changes, rollback, compare versions
+- **Flow Execution History** - View past runs, debug failures, analyze performance
+- **Command Palette** - Quick navigation with Ctrl+K
+- **Keyboard Shortcuts** - Efficient workflow (? to view all shortcuts)
+- **Multi-Device Control** - Control multiple devices simultaneously
+- **Custom Plugin Creator** - Build and share device plugins with UI
 - **Real-time Logging** - Live streaming with search, filter, and CSV export
 - **Plugin System** - 4 built-in plugins (ESP32 Motor Car, Arduino Sensor Board, Generic BLE/Serial)
 - **Theme System** - Dark/light mode with smooth transitions
@@ -367,12 +374,13 @@ pnpm dev
 
 ## 📊 Project Stats
 
-- **Source Files:** 62
+- **Source Files:** 80+
 - **Documentation:** 14 files
-- **Components:** 25+
-- **Pages:** 10+
-- **Lines of Code:** ~8,000+
+- **Components:** 35+
+- **Pages:** 15+
+- **Lines of Code:** ~12,000+
 - **Feature Completeness:** 100%
+- **Version:** 2.0.0
 
 ---
 
@@ -386,15 +394,20 @@ pnpm dev
 - ✅ Real-time logging
 - ✅ Plugin system
 
+### v2.0.0 (Latest)
+- ✅ Telemetry charts (Recharts)
+- ✅ Function versioning
+- ✅ Flow execution history
+- ✅ Custom plugin creator UI
+- ✅ Keyboard shortcuts
+- ✅ Command palette (Ctrl+K)
+- ✅ Multi-device control
+
 ### Future
-- [ ] Telemetry charts (Recharts)
-- [ ] Function versioning
-- [ ] Flow execution history
-- [ ] Custom plugin creator UI
-- [ ] Keyboard shortcuts
-- [ ] Command palette (Ctrl+K)
-- [ ] Multi-device control
-- [ ] Mobile app
+- [ ] Mobile app (React Native/PWA)
+- [ ] Data export & analytics
+- [ ] Cloud sync
+- [ ] Team collaboration
 
 ---
 

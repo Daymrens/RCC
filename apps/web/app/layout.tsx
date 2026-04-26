@@ -2,6 +2,8 @@ import './globals.css';
 import { Toaster } from 'sonner';
 import Sidebar from '@/components/layout/Sidebar';
 import ThemeToggle from '@/components/layout/ThemeToggle';
+import CommandPalette from '@/components/layout/CommandPalette';
+import ShortcutsHelp from '@/components/layout/ShortcutsHelp';
 
 export const metadata = {
   title: 'RoboDesk',
@@ -24,6 +26,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="flex-1 overflow-auto">{children}</main>
           </div>
         </div>
+        <CommandPalette />
+        <ShortcutsHelp />
         <Toaster theme="dark" />
       </body>
     </html>

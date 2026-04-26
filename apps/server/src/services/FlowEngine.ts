@@ -27,10 +27,9 @@ export class FlowEngine {
       data: { isActive: true }
     });
 
-    const nodes = flow.nodes as FlowNode[];
-    const edges = flow.edges as FlowEdge[];
+    const nodes = JSON.parse(flow.nodes) as FlowNode[];
+    const edges = JSON.parse(flow.edges) as FlowEdge[];
 
-    // Find trigger node
     const triggerNode = nodes.find(n => n.type === 'trigger');
     if (!triggerNode) throw new Error('No trigger node found');
 
@@ -59,34 +58,71 @@ export class FlowEngine {
   }
 
   private async executeFlow(flowId: string, deviceId: string, nodes: FlowNode[], edges: FlowEdge[]) {
-    const executionOrder = this.topologicalSort(nodes, edges);
-    let flowData: any = {};
+    const executionId = await this.createExecution(flowId);
+    const logs: string[] = [];
+    const startTime = Date.now();
 
-    for (const nodeId of executionOrder) {
-      const node = nodes.find(n => n.id === nodeId);
-      if (!node) continue;
+    try {
+      const executionOrder = this.topologicalSort(nodes, edges);
+      let flowData: any = {};
 
-      try {
-        flowData = await this.executeNode(node, deviceId, flowData, flowId);
-        
-        // Check for conditional branching
-        if (node.type === 'condition' && typeof flowData.conditionResult === 'boolean') {
-          const nextEdge = edges.find(e => 
-            e.source === nodeId && 
-            e.sourceHandle === (flowData.conditionResult ? 'true' : 'false')
-          );
-          if (!nextEdge) break;
+      for (const nodeId of executionOrder) {
+        const node = nodes.find(n => n.id === nodeId);
+        if (!node) continue;
+
+        try {
+          const log = `[${new Date().toISOString()}] Executing ${node.type} node`;
+          logs.push(log);
+          io.emit('flow:log', { flowId, nodeId, message: log, level: 'info' });
+
+          flowData = await this.executeNode(node, deviceId, flowData, flowId);
+          
+          if (node.type === 'condition' && typeof flowData.conditionResult === 'boolean') {
+            const nextEdge = edges.find(e => 
+              e.source === nodeId && 
+              e.sourceHandle === (flowData.conditionResult ? 'true' : 'false')
+            );
+            if (!nextEdge) break;
+          }
+        } catch (error: any) {
+          const errorLog = `Error in ${node.type}: ${error.message}`;
+          logs.push(errorLog);
+          io.emit('flow:log', { flowId, nodeId, message: errorLog, level: 'error' });
+          throw error;
         }
-      } catch (error: any) {
-        io.emit('flow:log', { flowId, nodeId, message: `Error: ${error.message}`, level: 'error' });
-        break;
       }
+
+      await this.completeExecution(executionId, 'completed', logs, Date.now() - startTime);
+    } catch (error: any) {
+      await this.completeExecution(executionId, 'failed', logs, Date.now() - startTime, error.message);
     }
   }
 
-  private async executeNode(node: FlowNode, deviceId: string, flowData: any, flowId: string): Promise<any> {
-    io.emit('flow:log', { flowId, nodeId: node.id, message: `Executing ${node.type}`, level: 'info' });
+  private async createExecution(flowId: string): Promise<string> {
+    const execution = await prisma.flowExecution.create({
+      data: {
+        flowId,
+        status: 'running',
+        logs: '[]'
+      }
+    });
+    return execution.id;
+  }
 
+  private async completeExecution(executionId: string, status: string, logs: string[], duration: number, error?: string) {
+    await prisma.flowExecution.update({
+      where: { id: executionId },
+      data: {
+        status,
+        completedAt: new Date(),
+        logs: JSON.stringify(logs),
+        error,
+        duration
+      }
+    });
+  }
+
+  private async executeNode(node: FlowNode, deviceId: string, flowData: any, flowId: string): Promise<any> {
     switch (node.type) {
       case 'trigger':
         return flowData;
@@ -94,7 +130,6 @@ export class FlowEngine {
       case 'send':
         const command = this.interpolate(node.data.command, flowData);
         await this.deviceManager.send(deviceId, command);
-        io.emit('flow:log', { flowId, nodeId: node.id, message: `Sent: ${command}`, level: 'info' });
         return flowData;
 
       case 'delay':
@@ -104,7 +139,6 @@ export class FlowEngine {
       case 'condition':
         const expression = this.interpolate(node.data.expression, flowData);
         const result = eval(expression);
-        io.emit('flow:log', { flowId, nodeId: node.id, message: `Condition: ${result}`, level: 'info' });
         return { ...flowData, conditionResult: result };
 
       case 'transform':

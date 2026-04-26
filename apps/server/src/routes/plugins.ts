@@ -29,7 +29,21 @@ const builtInPlugins = [
 ];
 
 router.get('/', async (req, res) => {
-  res.json(builtInPlugins);
+  const builtIn = builtInPlugins;
+  const custom = await prisma.plugin.findMany();
+  res.json([...builtIn, ...custom]);
+});
+
+router.post('/', async (req, res) => {
+  const plugin = await prisma.plugin.create({
+    data: {
+      ...req.body,
+      config: JSON.stringify(req.body.config),
+      functions: JSON.stringify(req.body.functions),
+      dashboards: JSON.stringify(req.body.dashboards)
+    }
+  });
+  res.json(plugin);
 });
 
 router.post('/:pluginId/apply/:deviceId', async (req, res) => {

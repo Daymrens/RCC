@@ -59,6 +59,14 @@ export default function Sidebar() {
             <span>🧩</span>
             {!collapsed && <span className="text-sm">Plugins</span>}
           </Link>
+          <Link
+            href="/multi-control"
+            className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
+            title={collapsed ? 'Multi-Control' : undefined}
+          >
+            <span>🎮</span>
+            {!collapsed && <span className="text-sm">Multi-Control</span>}
+          </Link>
         </div>
       </nav>
     </aside>
