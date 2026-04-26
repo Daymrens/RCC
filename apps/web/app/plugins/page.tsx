@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 
 export default function PluginsPage() {
   const router = useRouter();
