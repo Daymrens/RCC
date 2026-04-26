@@ -12,6 +12,7 @@ import pluginsRouter from './routes/plugins';
 import templatesRouter from './routes/templates';
 import { setupDeviceSocket } from './socket/deviceSocket';
 import { setupFlowSocket } from './socket/flowSocket';
+import exportRouter from './routes/export';
 
 const app = express();
 const httpServer = createServer(app);
@@ -31,6 +32,7 @@ app.use('/api/dashboards', dashboardsRouter);
 app.use('/api/serial', serialRouter);
 app.use('/api/plugins', pluginsRouter);
 app.use('/api/templates', templatesRouter);
+app.use('/api/export', exportRouter);
 
 setupDeviceSocket(io);
 setupFlowSocket(io);

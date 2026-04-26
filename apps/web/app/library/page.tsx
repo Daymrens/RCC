@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, Code, Trash2, Copy } from 'lucide-react';
+import { Plus, Code, Trash2, Copy, Download, Upload, Search, Filter } from 'lucide-react';
 
 export default function LibraryPage() {
   const router = useRouter();
@@ -12,6 +12,8 @@ export default function LibraryPage() {
   const [showApplyDialog, setShowApplyDialog] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const [selectedDevice, setSelectedDevice] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
 
   useEffect(() => {
     loadTemplates();
@@ -56,6 +58,44 @@ export default function LibraryPage() {
     setShowApplyDialog(true);
   };
 
+  const handleExport = async (template: any) => {
+    const response = await fetch(`http://localhost:3001/api/export/template/${template.id}`);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${template.name}.json`;
+    a.click();
+  };
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    await fetch('http://localhost:3001/api/export/templates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    loadTemplates();
+  };
+
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         template.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         template.tags?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = filterCategory === 'all' || template.category === filterCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
+
+  const categories = ['all', ...new Set(templates.map(t => t.category).filter(Boolean))];
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
@@ -65,13 +105,53 @@ export default function LibraryPage() {
             Create reusable code templates and apply them to any device
           </p>
         </div>
-        <Link
-          href="/library/create"
-          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-blue-600"
-        >
-          <Plus size={20} />
-          New Template
-        </Link>
+        <div className="flex gap-2">
+          <label className="flex items-center gap-2 px-4 py-2 bg-surface-2 rounded-lg hover:bg-surface-3 cursor-pointer">
+            <Upload size={20} />
+            Import
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+            />
+          </label>
+          <Link
+            href="/library/create"
+            className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-blue-600"
+          >
+            <Plus size={20} />
+            New Template
+          </Link>
+        </div>
+      </div>
+
+      {/* Search and Filter */}
+      <div className="flex gap-4 mb-6">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted" size={20} />
+          <input
+            type="text"
+            placeholder="Search templates..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-surface-2 border border-border rounded-lg"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Filter size={20} className="text-text-muted" />
+          <select
+            value={filterCategory}
+            onChange={e => setFilterCategory(e.target.value)}
+            className="px-4 py-2 bg-surface-2 border border-border rounded-lg"
+          >
+            {categories.map(cat => (
+              <option key={cat} value={cat}>
+                {cat === 'all' ? 'All Categories' : cat}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {templates.length === 0 ? (
@@ -91,7 +171,7 @@ export default function LibraryPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {templates.map(template => (
+          {filteredTemplates.map(template => (
             <div
               key={template.id}
               className="p-6 bg-surface rounded-lg border border-border hover:border-accent transition-colors"
@@ -101,6 +181,13 @@ export default function LibraryPage() {
                   {template.type === 'code' ? '📝' : '🔄'}
                 </div>
                 <div className="flex gap-2">
+                  <button
+                    onClick={() => handleExport(template)}
+                    className="p-1 hover:bg-surface-2 rounded"
+                    title="Export"
+                  >
+                    <Download size={16} />
+                  </button>
                   <button
                     onClick={() => router.push(`/library/${template.id}`)}
                     className="p-1 hover:bg-surface-2 rounded"
