@@ -194,27 +194,133 @@ main();`);
         </div>
 
         {/* Code Editor */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex">
           {type === 'code' ? (
             <>
-              <div className="h-10 border-b border-border flex items-center px-4 text-sm text-text-muted">
-                Code Editor
+              <div className="flex-1 flex flex-col">
+                <div className="h-10 border-b border-border flex items-center px-4 text-sm text-text-muted">
+                  Code Editor - JavaScript
+                </div>
+                <div className="flex-1">
+                  <MonacoEditor
+                    height="100%"
+                    language="javascript"
+                    theme="vs-dark"
+                    value={code}
+                    onChange={value => setCode(value || '')}
+                    options={{
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      lineNumbers: 'on',
+                      scrollBeyondLastLine: false,
+                      automaticLayout: true
+                    }}
+                  />
+                </div>
               </div>
-              <div className="flex-1">
-                <MonacoEditor
-                  height="100%"
-                  language="javascript"
-                  theme="vs-dark"
-                  value={code}
-                  onChange={value => setCode(value || '')}
-                  options={{
-                    minimap: { enabled: false },
-                    fontSize: 14,
-                    lineNumbers: 'on',
-                    scrollBeyondLastLine: false,
-                    automaticLayout: true
-                  }}
-                />
+
+              {/* API Reference Panel */}
+              <div className="w-80 border-l border-border overflow-y-auto bg-surface-2">
+                <div className="p-4">
+                  <h3 className="font-semibold mb-3 text-accent">📚 Available API</h3>
+                  
+                  <div className="space-y-4 text-sm">
+                    {/* Device API */}
+                    <div>
+                      <div className="font-semibold mb-2 text-text-primary">Device API</div>
+                      <div className="space-y-2">
+                        <div className="bg-surface p-2 rounded">
+                          <code className="text-accent">device.send(data)</code>
+                          <p className="text-xs text-text-muted mt-1">Send data to device</p>
+                          <pre className="text-xs mt-1 text-text-dim">await device.send('hello');</pre>
+                        </div>
+                        
+                        <div className="bg-surface p-2 rounded">
+                          <code className="text-accent">device.onData(callback)</code>
+                          <p className="text-xs text-text-muted mt-1">Receive data from device</p>
+                          <pre className="text-xs mt-1 text-text-dim">device.onData((data) =&gt; {'{'}
+  device.log(data);
+{'}'});</pre>
+                        </div>
+                        
+                        <div className="bg-surface p-2 rounded">
+                          <code className="text-accent">device.log(message)</code>
+                          <p className="text-xs text-text-muted mt-1">Log to console</p>
+                          <pre className="text-xs mt-1 text-text-dim">device.log('Started');</pre>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Utilities */}
+                    <div>
+                      <div className="font-semibold mb-2 text-text-primary">Utilities</div>
+                      <div className="space-y-2">
+                        <div className="bg-surface p-2 rounded">
+                          <code className="text-accent">delay(ms)</code>
+                          <p className="text-xs text-text-muted mt-1">Async delay</p>
+                          <pre className="text-xs mt-1 text-text-dim">await delay(1000);</pre>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* JavaScript Features */}
+                    <div>
+                      <div className="font-semibold mb-2 text-text-primary">JavaScript Features</div>
+                      <div className="space-y-1 text-xs text-text-muted">
+                        <div>✓ Async/await</div>
+                        <div>✓ Promises</div>
+                        <div>✓ Arrow functions</div>
+                        <div>✓ Template literals</div>
+                        <div>✓ JSON parse/stringify</div>
+                        <div>✓ Try/catch</div>
+                        <div>✓ Loops (for, while)</div>
+                        <div>✓ setTimeout/setInterval</div>
+                      </div>
+                    </div>
+
+                    {/* Examples */}
+                    <div>
+                      <div className="font-semibold mb-2 text-text-primary">Quick Examples</div>
+                      <div className="space-y-2">
+                        <div className="bg-surface p-2 rounded">
+                          <div className="text-xs font-semibold mb-1">Send JSON</div>
+                          <pre className="text-xs text-text-dim">const cmd = {'{'}type: 'move'{'}'};
+await device.send(
+  JSON.stringify(cmd)
+);</pre>
+                        </div>
+                        
+                        <div className="bg-surface p-2 rounded">
+                          <div className="text-xs font-semibold mb-1">Loop with delay</div>
+                          <pre className="text-xs text-text-dim">for (let i = 0; i &lt; 10; i++) {'{'}
+  await device.send(`${'{'}i{'}'}`);
+  await delay(100);
+{'}'}</pre>
+                        </div>
+                        
+                        <div className="bg-surface p-2 rounded">
+                          <div className="text-xs font-semibold mb-1">Error handling</div>
+                          <pre className="text-xs text-text-dim">try {'{'}
+  await device.send('data');
+{'}'} catch (e) {'{'}
+  device.log('Error: ' + e);
+{'}'}</pre>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Limitations */}
+                    <div>
+                      <div className="font-semibold mb-2 text-text-primary">⚠️ Limitations</div>
+                      <div className="space-y-1 text-xs text-text-muted">
+                        <div>✗ No file system access</div>
+                        <div>✗ No network requests</div>
+                        <div>✗ 30 second timeout</div>
+                        <div>✗ Sandboxed execution</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </>
           ) : (
