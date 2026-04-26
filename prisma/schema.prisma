@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Device {
+  id               String      @id @default(uuid())
+  name             String
+  type             String
+  connectionConfig String
+  pluginId         String?
+  status           String      @default("disconnected")
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  functions        Function[]
+  flows            Flow[]
+  dashboards       Dashboard[]
+  logs             DeviceLog[]
+}
+
+model Function {
+  id          String   @id @default(uuid())
+  deviceId    String
+  device      Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  type        String
+  code        String?
+  flowData    String?
+  trigger     String
+  intervalMs  Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Flow {
+  id        String   @id @default(uuid())
+  deviceId  String
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  name      String
+  nodes     String
+  edges     String
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Dashboard {
+  id        String   @id @default(uuid())
+  deviceId  String
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  name      String
+  layout    String
+  widgets   Widget[]
+}
+
+model Widget {
+  id          String    @id @default(uuid())
+  dashboardId String
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  type        String
+  label       String
+  command     String
+  config      String
+  position    String
+}
+
+model DeviceLog {
+  id        String   @id @default(uuid())
+  deviceId  String
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  direction String
+  data      String
+  timestamp DateTime @default(now())
+}
+
+model Plugin {
+  id          String @id @default(uuid())
+  name        String
+  description String?
+  deviceType  String
+  config      String
+  functions   String
+  dashboards  String
+}

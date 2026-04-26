@@ -1,0 +1,12 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+allowBuilds:
+  '@abandonware/bluetooth-hci-socket': false
+  '@abandonware/noble': false
+  '@prisma/client': false
+  '@prisma/engines': false
+  '@serialport/bindings-cpp': false
+  esbuild: false
+  prisma: false
+  usb: false
