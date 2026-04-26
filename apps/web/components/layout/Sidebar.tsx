@@ -84,6 +84,22 @@ export default function Sidebar() {
             {!collapsed && <span className="text-sm">Scheduler</span>}
           </Link>
           <Link
+            href="/groups"
+            className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
+            title={collapsed ? 'Groups' : undefined}
+          >
+            <span>👥</span>
+            {!collapsed && <span className="text-sm">Groups</span>}
+          </Link>
+          <Link
+            href="/macros"
+            className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
+            title={collapsed ? 'Macros' : undefined}
+          >
+            <span>🎬</span>
+            {!collapsed && <span className="text-sm">Macros</span>}
+          </Link>
+          <Link
             href="/plugins"
             className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
             title={collapsed ? 'Plugins' : undefined}
@@ -98,6 +114,14 @@ export default function Sidebar() {
           >
             <span>🕹️</span>
             {!collapsed && <span className="text-sm">Multi-Control</span>}
+          </Link>
+          <Link
+            href="/api-keys"
+            className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
+            title={collapsed ? 'API Keys' : undefined}
+          >
+            <span>🔑</span>
+            {!collapsed && <span className="text-sm">API Keys</span>}
           </Link>
         </div>
       </nav>
