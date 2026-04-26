@@ -52,6 +52,14 @@ export default function Sidebar() {
         <div className="mt-6 pt-6 border-t border-border">
           {!collapsed && <div className="text-xs text-text-muted mb-2">WORKSPACE</div>}
           <Link
+            href="/library"
+            className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
+            title={collapsed ? 'Code Library' : undefined}
+          >
+            <span>📚</span>
+            {!collapsed && <span className="text-sm">Code Library</span>}
+          </Link>
+          <Link
             href="/plugins"
             className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
             title={collapsed ? 'Plugins' : undefined}

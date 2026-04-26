@@ -9,6 +9,7 @@ import flowsRouter from './routes/flows';
 import dashboardsRouter from './routes/dashboards';
 import serialRouter from './routes/serial';
 import pluginsRouter from './routes/plugins';
+import templatesRouter from './routes/templates';
 import { setupDeviceSocket } from './socket/deviceSocket';
 import { setupFlowSocket } from './socket/flowSocket';
 
@@ -29,6 +30,7 @@ app.use('/api/flows', flowsRouter);
 app.use('/api/dashboards', dashboardsRouter);
 app.use('/api/serial', serialRouter);
 app.use('/api/plugins', pluginsRouter);
+app.use('/api/templates', templatesRouter);
 
 setupDeviceSocket(io);
 setupFlowSocket(io);

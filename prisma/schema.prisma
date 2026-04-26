@@ -115,3 +115,18 @@ model Plugin {
   functions   String
   dashboards  String
 }
+
+model CodeTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  type        String   @default("code")
+  code        String?
+  flowData    String?
+  trigger     String   @default("manual")
+  intervalMs  Int?
+  tags        String?
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
