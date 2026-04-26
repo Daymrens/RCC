@@ -68,6 +68,22 @@ export default function Sidebar() {
             {!collapsed && <span className="text-sm">Code Library</span>}
           </Link>
           <Link
+            href="/analytics"
+            className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
+            title={collapsed ? 'Analytics' : undefined}
+          >
+            <span>📊</span>
+            {!collapsed && <span className="text-sm">Analytics</span>}
+          </Link>
+          <Link
+            href="/scheduler"
+            className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
+            title={collapsed ? 'Scheduler' : undefined}
+          >
+            <span>⏰</span>
+            {!collapsed && <span className="text-sm">Scheduler</span>}
+          </Link>
+          <Link
             href="/plugins"
             className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
             title={collapsed ? 'Plugins' : undefined}
@@ -80,7 +96,7 @@ export default function Sidebar() {
             className="flex items-center gap-2 py-2 px-3 rounded hover:bg-surface-2"
             title={collapsed ? 'Multi-Control' : undefined}
           >
-            <span>🎮</span>
+            <span>🕹️</span>
             {!collapsed && <span className="text-sm">Multi-Control</span>}
           </Link>
         </div>

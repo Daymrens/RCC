@@ -130,3 +130,29 @@ model CodeTemplate {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model ScheduledTask {
+  id              String          @id @default(uuid())
+  name            String
+  description     String?
+  schedule        String
+  type            String
+  targetId        String?
+  command         String?
+  isActive        Boolean         @default(true)
+  lastExecutedAt  DateTime?
+  executionCount  Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  executions      TaskExecution[]
+}
+
+model TaskExecution {
+  id          String        @id @default(uuid())
+  taskId      String
+  task        ScheduledTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  executedAt  DateTime      @default(now())
+  status      String
+  error       String?
+  duration    Int?
+}

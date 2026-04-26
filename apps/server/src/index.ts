@@ -13,6 +13,8 @@ import templatesRouter from './routes/templates';
 import { setupDeviceSocket } from './socket/deviceSocket';
 import { setupFlowSocket } from './socket/flowSocket';
 import exportRouter from './routes/export';
+import analyticsRouter from './routes/analytics';
+import schedulerRouter, { initializeScheduler } from './routes/scheduler';
 
 const app = express();
 const httpServer = createServer(app);
@@ -33,14 +35,17 @@ app.use('/api/serial', serialRouter);
 app.use('/api/plugins', pluginsRouter);
 app.use('/api/templates', templatesRouter);
 app.use('/api/export', exportRouter);
+app.use('/api/analytics', analyticsRouter);
+app.use('/api/scheduler', schedulerRouter);
 
 setupDeviceSocket(io);
 setupFlowSocket(io);
 
 const PORT = process.env.PORT || 3001;
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, async () => {
   console.log(`🚀 RoboDesk server running on http://localhost:${PORT}`);
+  await initializeScheduler();
 });
 
 export { io };
