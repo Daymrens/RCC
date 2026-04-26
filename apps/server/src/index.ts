@@ -15,6 +15,10 @@ import { setupFlowSocket } from './socket/flowSocket';
 import exportRouter from './routes/export';
 import analyticsRouter from './routes/analytics';
 import schedulerRouter, { initializeScheduler } from './routes/scheduler';
+import groupsRouter from './routes/groups';
+import macrosRouter from './routes/macros';
+import apiKeysRouter from './routes/api-keys';
+import externalApiRouter from './routes/external-api';
 
 const app = express();
 const httpServer = createServer(app);
@@ -37,6 +41,10 @@ app.use('/api/templates', templatesRouter);
 app.use('/api/export', exportRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/scheduler', schedulerRouter);
+app.use('/api/groups', groupsRouter);
+app.use('/api/macros', macrosRouter);
+app.use('/api/keys', apiKeysRouter);
+app.use('/api/v1', externalApiRouter);
 
 setupDeviceSocket(io);
 setupFlowSocket(io);
