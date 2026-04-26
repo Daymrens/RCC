@@ -47,13 +47,33 @@ export default function PluginsPage() {
 
   const parsePluginData = (plugin: any) => {
     try {
+      // Handle built-in plugins (already objects) vs custom plugins (JSON strings)
+      const config = typeof plugin.config === 'string' 
+        ? JSON.parse(plugin.config) 
+        : plugin.config || {};
+      
+      const functions = typeof plugin.functions === 'string'
+        ? JSON.parse(plugin.functions)
+        : plugin.functions || [];
+      
+      const dashboards = typeof plugin.dashboards === 'string'
+        ? JSON.parse(plugin.dashboards)
+        : plugin.dashboards || [];
+      
+      // Count total widgets across all dashboards
+      const widgetCount = dashboards.reduce((total: number, dashboard: any) => {
+        return total + (dashboard.widgets?.length || 0);
+      }, 0);
+      
       return {
-        config: JSON.parse(plugin.config || '{}'),
-        functions: JSON.parse(plugin.functions || '[]'),
-        dashboards: JSON.parse(plugin.dashboards || '[]')
+        config,
+        functions,
+        dashboards,
+        widgetCount
       };
-    } catch {
-      return { config: {}, functions: [], dashboards: [] };
+    } catch (e) {
+      console.error('Error parsing plugin data:', e);
+      return { config: {}, functions: [], dashboards: [], widgetCount: 0 };
     }
   };
 
@@ -96,8 +116,8 @@ export default function PluginsPage() {
                   <span className="text-accent">{data.functions.length}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-text-dim">Dashboards:</span>
-                  <span className="text-accent">{data.dashboards.length}</span>
+                  <span className="text-text-dim">Widgets:</span>
+                  <span className="text-accent">{data.widgetCount}</span>
                 </div>
               </div>
 
@@ -159,6 +179,10 @@ export default function PluginsPage() {
                           <span className="text-text-muted">Dashboards:</span>
                           <span>{data.dashboards.length}</span>
                         </div>
+                        <div className="flex justify-between">
+                          <span className="text-text-muted">Total Widgets:</span>
+                          <span>{data.widgetCount}</span>
+                        </div>
                       </div>
                     </div>
 
@@ -206,34 +230,53 @@ export default function PluginsPage() {
                       </div>
                     )}
 
-                    {/* Dashboards */}
+                    {/* Dashboards & Widgets */}
                     {data.dashboards.length > 0 && (
                       <div>
-                        <h3 className="font-semibold mb-3">Dashboard Widgets ({data.dashboards.length})</h3>
-                        <div className="space-y-3">
-                          {data.dashboards.map((widget: any, idx: number) => (
-                            <div key={idx} className="bg-surface-2 rounded-lg p-4">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <div className="font-semibold">{widget.label}</div>
-                                  <div className="text-xs text-text-muted mt-1">
-                                    Type: {widget.type}
-                                  </div>
+                        <h3 className="font-semibold mb-3">Dashboards & Widgets</h3>
+                        <div className="space-y-4">
+                          {data.dashboards.map((dashboard: any, dashIdx: number) => (
+                            <div key={dashIdx} className="bg-surface-2 rounded-lg p-4">
+                              <h4 className="font-semibold mb-3">{dashboard.name}</h4>
+                              {dashboard.widgets && dashboard.widgets.length > 0 ? (
+                                <div className="space-y-2">
+                                  {dashboard.widgets.map((widget: any, widgetIdx: number) => (
+                                    <div key={widgetIdx} className="bg-surface rounded-lg p-3">
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          <div className="font-semibold">{widget.label}</div>
+                                          <div className="text-xs text-text-muted mt-1">
+                                            Type: {widget.type}
+                                          </div>
+                                        </div>
+                                        <div className="text-2xl">
+                                          {widget.type === 'button' && '🔘'}
+                                          {widget.type === 'slider' && '🎚️'}
+                                          {widget.type === 'toggle' && '🔄'}
+                                          {widget.type === 'gauge' && '📊'}
+                                          {widget.type === 'display' && '📺'}
+                                          {widget.type === 'joystick' && '🕹️'}
+                                        </div>
+                                      </div>
+                                      {widget.command && (
+                                        <div className="mt-2 text-xs">
+                                          <span className="text-text-muted">Command:</span>
+                                          <code className="ml-2 px-2 py-1 bg-surface-2 rounded">{widget.command}</code>
+                                        </div>
+                                      )}
+                                      {widget.config && (
+                                        <div className="mt-2 text-xs">
+                                          <span className="text-text-muted">Config:</span>
+                                          <pre className="mt-1 px-2 py-1 bg-surface-2 rounded overflow-x-auto">
+                                            {JSON.stringify(widget.config, null, 2)}
+                                          </pre>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
                                 </div>
-                                <div className="text-2xl">
-                                  {widget.type === 'button' && '🔘'}
-                                  {widget.type === 'slider' && '🎚️'}
-                                  {widget.type === 'toggle' && '🔄'}
-                                  {widget.type === 'gauge' && '📊'}
-                                  {widget.type === 'display' && '📺'}
-                                  {widget.type === 'joystick' && '🕹️'}
-                                </div>
-                              </div>
-                              {widget.command && (
-                                <div className="mt-2 text-xs">
-                                  <span className="text-text-muted">Command:</span>
-                                  <code className="ml-2 px-2 py-1 bg-surface rounded">{widget.command}</code>
-                                </div>
+                              ) : (
+                                <p className="text-sm text-text-muted">No widgets in this dashboard</p>
                               )}
                             </div>
                           ))}
